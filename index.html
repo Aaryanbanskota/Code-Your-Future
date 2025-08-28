@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Java Journey • Learn Java from Scratch to Pro</title>
+  <meta name="description" content="A fun, interactive Java learning platform with animated lessons, coding challenges, and project submissions." />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Updated CSS with Java-themed styling and animations */
+    :root {
+      --java-blue: #5382a1;
+      --java-orange: #f89820;
+      --java-dark: #2c3e50;
+      --java-light: #ecf0f1;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --text: #2c3e50;
+      --muted: #7f8c8d;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --glow: 0 0 10px rgba(88, 152, 240, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--java-blue);
+      color: var(--white);
+      padding: .5rem 1rem;
+      z-index: 100;
+    }
+    .skip-link:focus { top: 0; }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .brand { 
+      display: flex; 
+      align-items: center; 
+      gap: .75rem; 
+    }
+    .brand-title { 
+      font-weight: 700; 
+      font-size: 1.5rem; 
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo { 
+      height: 45px; 
+      width: auto; 
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      padding: .5rem 0;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    .nav-links a:hover::after,
+    .nav-links a:focus::after,
+    .nav-links a.active::after { 
+      transform: scaleX(1); 
+    }
+    .nav-links a:hover {
+      color: var(--java-blue);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      color: var(--white);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: var(--glow);
+    }
+
+    .hamb {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      position: relative;
+    }
+    .hamb span,
+    .hamb span::before,
+    .hamb span::after {
+      display: block;
+      background: var(--text);
+      height: 3px;
+      width: 25px;
+      position: absolute;
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+    .hamb span {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .hamb span::before,
+    .hamb span::after {
+      content: "";
+      left: 0;
+    }
+    .hamb span::before { top: -8px; }
+    .hamb span::after { top: 8px; }
+    
+    .hamb.active span {
+      background: transparent;
+    }
+    .hamb.active span::before {
+      transform: rotate(45deg);
+      top: 0;
+    }
+    .hamb.active span::after {
+      transform: rotate(-45deg);
+      top: 0;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      border-top: 1px solid #e5e7eb;
+      padding: 1rem 0;
+    }
+    .mobile-menu.show { display: flex; }
+    .mobile-menu a {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .mobile-menu a:hover {
+      background: var(--java-light);
+      padding-left: 2rem;
+    }
+
+    .hero {
+      padding: 4rem 0;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(83, 130, 161, 0.1), rgba(248, 152, 32, 0.1));
+      border-radius: 0 0 20px 20px;
+      margin-bottom: 3rem;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero .tag {
+      font-size: 0.9rem;
+      color: var(--java-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(83, 130, 161, 0.1);
+      border-radius: 50px;
+      margin-bottom: 1rem;
+    }
+    .hero .title {
+      font-size: 3rem;
+      margin: 0.5rem 0 1rem;
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero .meta {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--java-blue);
+      border: 2px solid var(--java-blue);
+    }
+    .btn-secondary:hover {
+      background: var(--java-blue);
+      color: white;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .feature {
+      flex: 1;
+      min-width: 250px;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .feature:hover {
+      transform: translateY(-5px);
+    }
+    .feature i {
+      font-size: 2.5rem;
+      color: var(--java-blue);
+      margin-bottom: 1rem;
+    }
+    .feature h3 {
+      margin-bottom: 1rem;
+      color: var(--java-dark);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .panel {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .panel:hover {
+      transform: translateY(-3px);
+    }
+    .panel .cover img { 
+      width: 100%; 
+      display: block; 
+      height: 250px;
+      object-fit: cover;
+    }
+    .panel .content { padding: 2rem; }
+    .panel h2 { 
+      margin: 0 0 1rem; 
+      color: var(--java-dark);
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    .panel h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+    }
+    
+    .lesson-list {
+      list-style: none;
+    }
+    .lesson-item {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.2s;
+    }
+    .lesson-item:hover {
+      background: #f8f9fa;
+    }
+    .lesson-item i {
+      color: var(--java-blue);
+      font-size: 1.2rem;
+    }
+    .lesson-item.completed {
+      background: rgba(39, 174, 96, 0.1);
+    }
+    .lesson-item.completed .lesson-title {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-left: auto;
+    }
+    .badge-easy {
+      background: rgba(39, 174, 96, 0.2);
+      color: var(--success);
+    }
+    .badge-medium {
+      background: rgba(230, 126, 34, 0.2);
+      color: var(--warning);
+    }
+    .badge-hard {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    blockquote {
+      border-left: 4px solid var(--java-blue);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      background: rgba(83, 130, 161, 0.05);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+    }
+
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Fira Code', monospace;
+      position: relative;
+    }
+    .code-block::before {
+      content: "Java";
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--java-blue);
+      color: white;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.8rem;
+      border-radius: 0 0 0 8px;
+    }
+
+    .challenge {
+      background: white;
+      border: 2px solid var(--java-light);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .challenge h3 {
+      color: var(--java-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .challenge h3 i {
+      color: var(--java-orange);
+    }
+    .challenge p {
+      margin-bottom: 1rem;
+    }
+    .submit-btn {
+      background: var(--java-blue);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .submit-btn:hover {
+      background: var(--java-orange);
+      transform: translateY(-2px);
+    }
+
+    .sidebar { padding: 1.5rem; }
+    .sidebar h3 { 
+      margin-bottom: 1rem;
+      color: var(--java-dark);
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    .sidebar h3::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px;
+      height: 3px;
+      background: var(--java-orange);
+    }
+    .list { display: flex; flex-direction: column; gap: 1rem; }
+    .card {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s;
+      border-left: 4px solid var(--java-blue);
+    }
+    .card:hover { 
+      transform: translateY(-3px); 
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--java-orange);
+    }
+
+    footer { 
+      background: var(--java-dark); 
+      color: #d1d5db; 
+      padding: 2rem 0; 
+      margin-top: 4rem;
+    }
+    .foot { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .foot a.btn { 
+      background: none; 
+      border: 1px solid #d1d5db; 
+      color: #d1d5db; 
+    }
+    .foot a.btn:hover { 
+      background: rgba(255,255,255,0.1); 
+    }
+
+    .to-top {
+      position: fixed;
+      right: 2rem;
+      bottom: 2rem;
+      background: var(--java-blue);
+      color: var(--white);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+      z-index: 99;
+      transition: all 0.3s;
+    }
+    .to-top:hover {
+      background: var(--java-orange);
+      transform: translateY(-5px);
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      width: 0%;
+      z-index: 100;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      position: relative;
+      animation: modalFadeIn 0.3s;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    /* Animation for code examples */
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    .typewriter {
+      overflow: hidden;
+      border-right: 3px solid var(--java-orange);
+      white-space: nowrap;
+      animation: typewriter 4s steps(40) 1s infinite alternate;
+    }
+
+    /* Achievement badges */
+    .achievements {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+    .achievement {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      flex: 1;
+      min-width: 120px;
+    }
+    .achievement i {
+      font-size: 2rem;
+      color: var(--java-orange);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Level progress */
+    .level-progress {
+      margin: 2rem 0;
+    }
+    .progress-bar {
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      border-radius: 5px;
+      width: 65%;
+      position: relative;
+      animation: fillAnimation 2s ease-in-out;
+    }
+    @keyframes fillAnimation {
+      from { width: 0; }
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero .title { font-size: 2.5rem; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamb { display: block; }
+      .mobile-menu { display: none; }
+      .hero .title { font-size: 2rem; }
+      .features { flex-direction: column; }
+      .cta-buttons { flex-direction: column; }
+      .foot { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="progress" id="progress"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTM4MmExIiBkPSJNNDQ4IDQwMGMwIDM1LjMtMTQzLjMgNjQtMzIwIDY0UjAgNDM1LjMgMCA0MDBzMTQzLjMtNjQgMzIwLTY0czMyMCAyOC43IDMyMCA2NHptLTMyMC0yNTZjLTExNC45IDAtMjA4LTQ4LjctMjA4LTEwOFMxMTMuMSAyOCAyMjggMjhzMjA4IDQ4LjcgMjA4IDEwOC05My4xIDEwOC0yMDggMTA4eiIvPjxwYXRoIGZpbGw9IiNmODk4MjAiIGQ9Ik0yMjggMTY4Yy0zMy4xIDAtNjAtMTMuNC02MC0zMHMzNi45LTMwIDYwLTMwIDYwIDEzLjQgNjAgMzAtMjYuOSAzMC02MCAzMHptMTUyIDU2YzAgMTYuNi00My45IDMwLTk4IDMwcy05OC0xMy40LTk4LTMwIDQzLjktMzAgOTgtMzAgOTggMTMuNCA5OCAzMHoiLz48L3N2Zz4=" alt="Java Journey Logo" />
+        <div class="brand-title">Java Journey</div>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a class="active" href="#home">Home</a>
+        <a href="lessons1.html">Lessons</a>
+        <a href="challenges.html">Challenges</a>
+        <a href="#progress-track">Progress</a>
+        <a href="#community">Community</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn" href="#subscribe">Subscribe</a>
+        <button class="hamb" id="hamb" aria-label="Open menu"><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="#home">Home</a>
+      <a href="lessons1.html">Lessons</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="#progress-track">Progress</a>
+      <a href="#community">Community</a>
+      <a href="#subscribe">Subscribe</a>
+    </div>
+  </header>
+
+  <section class="hero container" id="home">
+    <span class="tag">Start Your Coding Adventure</span>
+    <h1 class="title">Learn Java from Beginner to Pro</h1>
+    <p class="meta">Fun, interactive lessons with animations, challenges, and real projects. Start your journey to becoming a Java expert today!</p>
+    <div class="cta-buttons">
+      <a class="btn" href="lessons1.html">Start Learning</a>
+      <a class="btn btn-secondary" href="challenges.html">Try a Challenge</a>
+    </div>
+  </section>
+
+  <div class="container features">
+    <div class="feature">
+      <i class="fas fa-graduation-cap"></i>
+      <h3>Step-by-Step Lessons</h3>
+      <p>Progress from basics to advanced concepts with our structured curriculum.</p>
+    </div>
+    <div class="feature">
+      <i class="fas fa-code"></i>
+      <h3>Interactive Coding</h3>
+      <p>Practice directly in your browser with our built-in code editor.</p>
+    </div>
+    <div class="feature">
+      <i class="fas fa-trophy"></i>
+      <h3>Earn Achievements</h3>
+      <p>Get badges and certificates as you complete lessons and challenges.</p>
+    </div>
+  </div>
+
+  <main class="container grid" id="main">
+    <article class="panel" aria-labelledby="article-title">
+      <div class="cover"><img src="https://images.unsplash.com/photo-1587620962725-abab7fe55159?q=80&w=1920&auto=format&fit=crop" alt="Java code on computer screen" loading="lazy"></div>
+      <div class="content">
+        <h2 id="article-title">Your First Java Program</h2>
+        
+        <div class="level-progress">
+          <h3>Your Progress: Level 3 Beginner</h3>
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+          <p>65% complete - Next: Object-Oriented Programming</p>
+        </div>
+        
+        <p>
+          Let's start with the classic "Hello World" program. This is the first step for every Java programmer!
+        </p>
+        
+        <div class="code-block">
+<pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}</code></pre>
+        </div>
+        
+        <p>In this code:</p>
+        <ul>
+          <li><code>public class HelloWorld</code> defines a class named HelloWorld</li>
+          <li><code>public static void main(String[] args)</code> is the main method where program execution begins</li>
+          <li><code>System.out.println()</code> prints text to the console</li>
+        </ul>
+        
+        <div class="challenge">
+          <h3><i class="fas fa-puzzle-piece"></i> Your Challenge</h3>
+          <p>Modify the program to print your name instead of "World". Then create a program that prints a triangle of asterisks like this:</p>
+          <div class="code-block">
+<pre><code>*
+**
+***
+****
+*****</code></pre>
+          </div>
+          <button class="submit-btn" id="submitChallenge"><i class="fas fa-paper-plane"></i> Submit Your Solution</button>
+        </div>
+        
+        <h2>Variables and Data Types</h2>
+        <p>Java uses variables to store data. Here are the basic data types:</p>
+        
+        <div class="code-block">
+<pre><code>int age = 25;                    // Integer
+double price = 19.99;           // Decimal number
+char grade = 'A';               // Single character
+boolean isJavaFun = true;       // True or false
+String message = "Hello Java";  // Text</code></pre>
+        </div>
+        
+        <blockquote>
+          "Practice is the best of all instructors." - Publilius Syrus
+        </blockquote>
+        
+        <div class="achievements">
+          <div class="achievement">
+            <i class="fas fa-code"></i>
+            <h4>First Program</h4>
+            <p>Completed</p>
+          </div>
+          <div class="achievement">
+            <i class="fas fa-bolt"></i>
+            <h4>Quick Learner</h4>
+            <p>2 days streak</p>
+          </div>
+          <div class="achievement">
+            <i class="fas fa-star"></i>
+            <h4>Challenge Master</h4>
+            <p>3 completed</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <aside class="panel sidebar" aria-labelledby="related">
+      <div>
+        <h3 id="related">Lesson Path</h3>
+        <ul class="lesson-list">
+          <li class="lesson-item completed">
+            <i class="fas fa-check-circle"></i>
+            <span class="lesson-title">Introduction to Java</span>
+          </li>
+          <li class="lesson-item completed">
+            <i class="fas fa-check-circle"></i>
+            <span class="lesson-title">Setting Up Environment</span>
+          </li>
+          <li class="lesson-item completed">
+            <i class="fas fa-check-circle"></i>
+            <span class="lesson-title">Your First Program</span>
+          </li>
+          <li class="lesson-item">
+            <i class="fas fa-circle"></i>
+            <span class="lesson-title">Variables & Data Types</span>
+            <span class="badge badge-easy">Easy</span>
+          </li>
+          <li class="lesson-item">
+            <i class="fas fa-circle"></i>
+            <span class="lesson-title">Operators</span>
+            <span class="badge badge-easy">Easy</span>
+          </li>
+          <li class="lesson-item">
+            <i class="fas fa-circle"></i>
+            <span class="lesson-title">Control Flow</span>
+            <span class="badge badge-medium">Medium</span>
+          </li>
+          <li class="lesson-item">
+            <i class="fas fa-circle"></i>
+            <span class="lesson-title">Methods</span>
+            <span class="badge badge-medium">Medium</span>
+          </li>
+          <li class="lesson-item">
+            <i class="fas fa-circle"></i>
+            <span class="lesson-title">Object-Oriented Programming</span>
+            <span class="badge badge-hard">Hard</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-top:1.5rem">Upcoming Challenges</h3>
+        <div class="list">
+          <a class="card" href="#">
+            <i class="fas fa-calculator"></i> Calculator App
+          </a>
+          <a class="card" href="#">
+            <i class="fas fa-gamepad"></i> Number Guessing Game
+          </a>
+          <a class="card" href="#">
+            <i class="fas fa-tasks"></i> Todo List Application
+          </a>
+          <a class="card" href="#">
+            <i class="fas fa-database"></i> Student Management System
+          </a>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="modal" id="submitModal">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModal">&times;</button>
+      <h2>Submit Your Solution</h2>
+      <p>Share your code and what you've learned from this challenge.</p>
+      <form id="submissionForm">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+          <label for="code">Your Java Code</label>
+          <textarea id="code" placeholder="Paste your Java code here..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="reflection">What did you learn?</label>
+          <textarea id="reflection" placeholder="Share your experience and what you learned..." required></textarea>
+        </div>
+        <button type="submit" class="btn">Submit Solution</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container foot">
+      <span>© 2025 Java Journey. All rights reserved.</span>
+      <nav aria-label="Footer">
+        <a class="btn" href="#privacy">Privacy</a>
+        <a class="btn" href="#terms">Terms</a>
+        <a class="btn" href="mailto:tempkoho942@gmail.com">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <a href="#top" class="to-top" id="toTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // Mobile menu toggle
+    const hamb = document.getElementById("hamb");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    hamb.addEventListener("click", () => {
+      mobileMenu.classList.toggle("show");
+      hamb.classList.toggle("active");
+    });
+
+    // Back to top button
+    const toTop = document.getElementById("toTop");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 400) {
+        toTop.style.display = "flex";
+      } else {
+        toTop.style.display = "none";
+      }
+    });
+
+    // Smooth scroll back to top
+    if (toTop) {
+      toTop.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    // Reading progress bar
+    const progress = document.getElementById("progress");
+    window.addEventListener("scroll", () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrolled = (scrollTop / docHeight) * 100;
+      progress.style.width = scrolled + "%";
+    });
+
+    // Challenge submission modal
+    const submitBtn = document.getElementById("submitChallenge");
+    const modal = document.getElementById("submitModal");
+    const closeModal = document.getElementById("closeModal");
+    const form = document.getElementById("submissionForm");
+
+    if (submitBtn && modal) {
+      submitBtn.addEventListener("click", () => {
+        modal.style.display = "flex";
+      });
+    }
+
+    if (closeModal) {
+      closeModal.addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+
+    // Form submission
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        // Get form values
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const code = document.getElementById("code").value;
+        const reflection = document.getElementById("reflection").value;
+        
+        // In a real application, you would send this data to a server
+        // For this demo, we'll just show an alert and close the modal
+        alert(`Thank you ${name}! Your solution has been submitted. We'll review it and get back to you at ${email}.`);
+        modal.style.display = "none";
+        form.reset();
+      });
+    }
+
+    // Animate progress bars on scroll
+    function animateProgressBars() {
+      const progressBars = document.querySelectorAll('.progress-fill');
+      progressBars.forEach(bar => {
+        const barPosition = bar.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.3;
+        
+        if (barPosition < screenPosition) {
+          bar.style.animation = 'fillAnimation 2s ease-in-out';
+        }
+      });
+    }
+
+    window.addEventListener('scroll', animateProgressBars);
+    // Initial call
+    animateProgressBars();
+
+    // Typewriter effect for code examples
+    function initTypewriter() {
+      const elements = document.querySelectorAll('.typewriter');
+      elements.forEach(el => {
+        const text = el.textContent;
+        el.textContent = '';
+        let i = 0;
+        
+        function type() {
+          if (i < text.length) {
+            el.textContent += text.charAt(i);
+            i++;
+            setTimeout(type, 100);
+          }
+        }
+        
+        type();
+      });
+    }
+
+    // Initialize typewriter effect after page load
+    window.addEventListener('load', initTypewriter);
+  </script>
+</body>
+</html>

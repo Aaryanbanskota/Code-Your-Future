@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Java Journey • Lesson 11 & 12: OOP Superpowers</title>
+  <meta name="description" content="Learn the four pillars of OOP: Inheritance, Polymorphism, Encapsulation, and Abstraction with detailed examples." />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Consistent with the main site styling */
+    :root {
+      --java-blue: #5382a1;
+      --java-orange: #f89820;
+      --java-dark: #2c3e50;
+      --java-light: #ecf0f1;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --text: #2c3e50;
+      --muted: #7f8c8d;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --glow: 0 0 10px rgba(88, 152, 240, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--java-blue);
+      color: var(--white);
+      padding: .5rem 1rem;
+      z-index: 100;
+    }
+    .skip-link:focus { top: 0; }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .brand { 
+      display: flex; 
+      align-items: center; 
+      gap: .75rem; 
+    }
+    .brand-title { 
+      font-weight: 700; 
+      font-size: 1.5rem; 
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo { 
+      height: 45px; 
+      width: auto; 
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      padding: .5rem 0;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    .nav-links a:hover::after,
+    .nav-links a:focus::after,
+    .nav-links a.active::after { 
+      transform: scaleX(1); 
+    }
+    .nav-links a:hover {
+      color: var(--java-blue);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      color: var(--white);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: var(--glow);
+    }
+
+    .hamb {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      position: relative;
+    }
+    .hamb span,
+    .hamb span::before,
+    .hamb span::after {
+      display: block;
+      background: var(--text);
+      height: 3px;
+      width: 25px;
+      position: absolute;
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+    .hamb span {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .hamb span::before,
+    .hamb span::after {
+      content: "";
+      left: 0;
+    }
+    .hamb span::before { top: -8px; }
+    .hamb span::after { top: 8px; }
+    
+    .hamb.active span {
+      background: transparent;
+    }
+    .hamb.active span::before {
+      transform: rotate(45deg);
+      top: 0;
+    }
+    .hamb.active span::after {
+      transform: rotate(-45deg);
+      top: 0;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      border-top: 1px solid #e5e7eb;
+      padding: 1rem 0;
+    }
+    .mobile-menu.show { display: flex; }
+    .mobile-menu a {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .mobile-menu a:hover {
+      background: var(--java-light);
+      padding-left: 2rem;
+    }
+
+    .lesson-header {
+      padding: 2rem 0;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(83, 130, 161, 0.1), rgba(248, 152, 32, 0.1));
+      border-radius: 0 0 20px 20px;
+      margin-bottom: 2rem;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .lesson-tag {
+      font-size: 0.9rem;
+      color: var(--java-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(83, 130, 161, 0.1);
+      border-radius: 50px;
+      margin-bottom: 1rem;
+    }
+    .lesson-title {
+      font-size: 2.5rem;
+      margin: 0.5rem 0 1rem;
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .lesson-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .lesson-body {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 2rem;
+    }
+    
+    .lesson-section {
+      margin-bottom: 2.5rem;
+    }
+    
+    .lesson-section h2 {
+      color: var(--java-dark);
+      margin-bottom: 1rem;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    .lesson-section h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+    }
+    
+    .info-card {
+      background: rgba(83, 130, 161, 0.05);
+      border-left: 4px solid var(--java-blue);
+      padding: 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+    
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 1.5rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      font-family: 'Fira Code', monospace;
+      position: relative;
+    }
+    .code-block::before {
+      content: "Java";
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--java-blue);
+      color: white;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.8rem;
+      border-radius: 0 0 0 8px;
+    }
+    
+    .challenge {
+      background: white;
+      border: 2px solid var(--java-light);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .challenge h3 {
+      color: var(--java-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .challenge h3 i {
+      color: var(--java-orange);
+    }
+    .challenge p {
+      margin-bottom: 1rem;
+    }
+    
+    .syntax-box {
+      background: rgba(83, 130, 161, 0.05);
+      border: 1px solid rgba(83, 130, 161, 0.2);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: 'Fira Code', monospace;
+    }
+    
+    .lesson-sidebar {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+    
+    .progress-widget {
+      background: linear-gradient(135deg, rgba(83, 130, 161, 0.1), rgba(248, 152, 32, 0.1));
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      border-radius: 5px;
+      width: 0%;
+      transition: width 1s ease-in-out;
+    }
+    
+    .completion-badge {
+      display: inline-block;
+      background: var(--success);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-weight: 600;
+      margin-top: 1rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s ease;
+    }
+    
+    .completion-badge.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .checkpoint {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .checkpoint:hover {
+      background: #e9ecef;
+    }
+    
+    .checkpoint input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    
+    .checkpoint.completed {
+      background: rgba(39, 174, 96, 0.1);
+    }
+    
+    .checkpoint.completed label {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    
+    footer { 
+      background: var(--java-dark); 
+      color: #d1d5db; 
+      padding: 2rem 0; 
+      margin-top: 4rem;
+    }
+    .foot { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .foot a.btn { 
+      background: none; 
+      border: 1px solid #d1d5db; 
+      color: #d1d5db; 
+    }
+    .foot a.btn:hover { 
+      background: rgba(255,255,255,0.1); 
+    }
+
+    .to-top {
+      position: fixed;
+      right: 2rem;
+      bottom: 2rem;
+      background: var(--java-blue);
+      color: var(--white);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+      z-index: 99;
+      transition: all 0.3s;
+    }
+    .to-top:hover {
+      background: var(--java-orange);
+      transform: translateY(-5px);
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      width: 0%;
+      z-index: 100;
+    }
+
+    /* Pillars styling */
+    .pillars-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .pillar-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border-top: 4px solid var(--java-blue);
+    }
+    
+    .pillar-card h3 {
+      color: var(--java-blue);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .pillar-card h3 i {
+      color: var(--java-orange);
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .lesson-content { grid-template-columns: 1fr; }
+      .lesson-title { font-size: 2rem; }
+      .pillars-container { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamb { display: block; }
+      .mobile-menu { display: none; }
+      .lesson-title { font-size: 1.75rem; }
+      .navigation-buttons { flex-direction: column; gap: 1rem; }
+      .foot { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="progress" id="progress"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTM4MmExIiBkPSJNNDQ4IDQwMGMwIDM1LjMtMTQzLjMgNjQtMzIwIDY0UjAgNDM1LjMgMCA0MDBzMTQzLjMtNjQgMzIwLTY0czMyMCAyOC43IDMyMCA2NHptLTMyMC0yNTZjLTExNC45IDAtMjA4LTQwLjctMjA4LTkwLjZzOTMuMS05MC42IDIwOC05MC42IDIwOCA0MC43IDIwOCA5MC42LTk3LjEgOTAuNi0yMDggOTAuNnoiLz48cGF0aCBmaWxsPSIjZjg5ODIwIiBkPSJNMjI4IDE2OGMtMzMuMSAwLTYwLTEzLjQtNjAtMzBzMjYuOS0zMCA2MC0zMCA2MCAxMy40IDYwIDMwLTI2LjkgMzAtNjAgMzB6bTE1MiA1NmMwIDE2LjYtNDMuOSAzMC05OCAzMHMtOTgtMTMuNC05OC0zMCA0My45LTMwIDk4LTMwIDk4IDEzLjQgOTggMzB6Ii8+PC9zdmc+" alt="Java Journey Logo" />
+        <div class="brand-title">Java Journey</div>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a class="active" href="#lesson">Lessons</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#progress-track">Progress</a>
+        <a href="#community">Community</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn" href="#subscribe">Subscribe</a>
+        <button class="hamb" id="hamb" aria-label="Open menu"><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="index.html">Home</a>
+      <a href="#lesson">Lessons</a>
+      <a href="#challenges">Challenges</a>
+      <a href="#progress-track">Progress</a>
+      <a href="#community">Community</a>
+      <a href="#subscribe">Subscribe</a>
+    </div>
+  </header>
+
+  <section class="lesson-header container">
+    <span class="lesson-tag">OOP Superpowers</span>
+    <h1 class="lesson-title">Lesson 11 & 12: Inheritance, Polymorphism, Encapsulation, and Abstraction</h1>
+    <p class="meta">Learn the four pillars of OOP with detailed examples and become a Java superhero!</p>
+  </section>
+
+  <div class="container lesson-content" id="main">
+    <article class="lesson-body">
+      <div class="lesson-section">
+        <h2>🌟 Welcome back, Java Adventurer!</h2>
+        <p>You've learned about Classes and Objects. That was like learning how to make toys from a mold. Now, it's time to learn how to reuse, extend, and protect those toys so you don't have to start from scratch every time.</p>
+        <p>This lesson is about 4 Superpowers of OOP (Object-Oriented Programming). They are:</p>
+        
+        <div class="pillars-container">
+          <div class="pillar-card">
+            <h3><i class="fas fa-family"></i> Inheritance</h3>
+            <p>Passing traits from parents to children 👨‍👩‍👧‍👦</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-theater-masks"></i> Polymorphism</h3>
+            <p>One name, many forms 🎭</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-lock"></i> Encapsulation</h3>
+            <p>Keeping data safe 🔒</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-paint-brush"></i> Abstraction</h3>
+            <p>Showing only the important details 🎨</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🧬 1. Inheritance — Passing Traits from Parents to Children</h2>
+        <p>Inheritance means a class (child) can take all the features of another class (parent).</p>
+        
+        <div class="info-card">
+          <p><strong>💡 Example in real life:</strong> A parent class "Animal" can have common traits like eat() and sleep(). A child class "Dog" or "Cat" can inherit these traits, but also add their own like bark() or meow().</p>
+        </div>
+        
+        <p><strong>Example: Inheritance in Java</strong></p>
+        <div class="code-block">
+          <pre><code>// Parent class
+class Animal {
+    void eat() {
+        System.out.println("This animal eats food 🍎");
+    }
+}
+
+// Child class
+class Dog extends Animal {
+    void bark() {
+        System.out.println("The dog barks 🐶");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        d.eat();   // Inherited from Animal
+        d.bark();  // Defined in Dog
+    }
+}</code></pre>
+        </div>
+        
+        <p>✅ Output:</p>
+        <div class="code-block">
+          <pre><code>This animal eats food 🍎
+The dog barks 🐶</code></pre>
+        </div>
+        
+        <div class="info-card">
+          <p><strong>⚡ Key Idea:</strong> Inheritance lets you reuse code instead of writing the same thing again.</p>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🎭 2. Polymorphism — One Name, Many Forms</h2>
+        <p>Polymorphism means "many forms."</p>
+        <p>The same method can behave differently depending on which object is using it.</p>
+        
+        <div class="info-card">
+          <p><strong>💡 Think of the word "play"</strong> — a child plays with toys, a singer plays music, a footballer plays football. Same word, different meaning!</p>
+        </div>
+        
+        <p><strong>Example: Method Overriding (Run-Time Polymorphism)</strong></p>
+        <div class="code-block">
+          <pre><code>class Animal {
+    void sound() {
+        System.out.println("Animals make sounds 🎵");
+    }
+}
+
+class Dog extends Animal {
+    void sound() {
+        System.out.println("Dog says Woof! 🐶");
+    }
+}
+
+class Cat extends Animal {
+    void sound() {
+        System.out.println("Cat says Meow! 🐱");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a1 = new Dog();  // Dog object
+        Animal a2 = new Cat();  // Cat object
+        
+        a1.sound();  // Woof!
+        a2.sound();  // Meow!
+    }
+}</code></pre>
+        </div>
+        
+        <p>✅ Output:</p>
+        <div class="code-block">
+          <pre><code>Dog says Woof! 🐶
+Cat says Meow! 🐱</code></pre>
+        </div>
+        
+        <div class="info-card">
+          <p><strong>⚡ Key Idea:</strong> Polymorphism = One method name, different behaviors.</p>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🔒 3. Encapsulation — Keep Data Safe</h2>
+        <p>Encapsulation means hiding the details and protecting data.</p>
+        <p>You wrap variables inside a class and only allow access through methods (getters & setters).</p>
+        
+        <div class="info-card">
+          <p><strong>💡 Just like medicine is kept in a capsule</strong> — you don't see what's inside, you just take it safely. 💊</p>
+        </div>
+        
+        <p><strong>Example: Encapsulation</strong></p>
+        <div class="code-block">
+          <pre><code>class BankAccount {
+    private int balance = 1000; // private: hidden from outside
+
+    // Getter
+    public int getBalance() {
+        return balance;
+    }
+
+    // Setter
+    public void deposit(int amount) {
+        balance += amount;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount();
+        
+        // Access balance safely
+        System.out.println("Balance: " + account.getBalance());
+        
+        account.deposit(500);
+        System.out.println("After deposit: " + account.getBalance());
+    }
+}</code></pre>
+        </div>
+        
+        <p>✅ Output:</p>
+        <div class="code-block">
+          <pre><code>Balance: 1000
+After deposit: 1500</code></pre>
+        </div>
+        
+        <div class="info-card">
+          <p><strong>⚡ Key Idea:</strong> Encapsulation = Protecting variables by using private + getters/setters.</p>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🎨 4. Abstraction — Show Only What's Important</h2>
+        <p>Abstraction means hiding the complex stuff and showing only what is necessary.</p>
+        
+        <div class="info-card">
+          <p><strong>💡 When you drive a car</strong>, you just use the steering wheel and pedals 🚗. You don't care about the engine's inner details.</p>
+        </div>
+        
+        <p><strong>Example: Abstract Class</strong></p>
+        <div class="code-block">
+          <pre><code>abstract class Animal {
+    abstract void sound(); // No body, only idea
+}
+
+class Dog extends Animal {
+    void sound() {
+        System.out.println("Dog says Woof! 🐶");
+    }
+}
+
+class Cat extends Animal {
+    void sound() {
+        System.out.println("Cat says Meow! 🐱");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal d = new Dog();
+        Animal c = new Cat();
+        
+        d.sound();
+        c.sound();
+    }
+}</code></pre>
+        </div>
+        
+        <p>✅ Output:</p>
+        <div class="code-block">
+          <pre><code>Dog says Woof! 🐶
+Cat says Meow! 🐱</code></pre>
+        </div>
+        
+        <div class="info-card">
+          <p><strong>⚡ Key Idea:</strong> Abstraction = Show only the important parts, hide the messy details.</p>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🎮 Mini Challenges for You</h2>
+        <div class="challenge">
+          <h3><i class="fas fa-puzzle-piece"></i> Your Challenge</h3>
+          <p>Create a Vehicle parent class with a method move(). Make Car and Bike classes that override it.</p>
+          <p>Make a Student class with private marks. Use getMarks() and setMarks() methods to update and read marks.</p>
+          <p>Write an abstract class Shape with an abstract method area(). Make Circle and Rectangle classes that implement area().</p>
+          
+          <div class="checkpoint">
+            <input type="checkbox" id="challenge-check">
+            <label for="challenge-check">I've completed the programming challenge</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2>🌈 Summary</h2>
+        <div class="pillars-container">
+          <div class="pillar-card">
+            <h3><i class="fas fa-family"></i> Inheritance</h3>
+            <p>Child classes reuse parent features</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-theater-masks"></i> Polymorphism</h3>
+            <p>Same method name, different behaviors</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-lock"></i> Encapsulation</h3>
+            <p>Protect data with getters & setters</p>
+          </div>
+          
+          <div class="pillar-card">
+            <h3><i class="fas fa-paint-brush"></i> Abstraction</h3>
+            <p>Show the essential, hide the complexity</p>
+          </div>
+        </div>
+        
+        <p>👏 These 4 superpowers are the foundation of professional Java programming. Once you master them, you can design powerful, reusable, and secure code like a pro!</p>
+        
+        <div class="info-card">
+          <p><strong>Next up (Lesson 13):</strong> Java Collections Framework where you'll learn how to organize and manage groups of data like a pro librarian 📚.</p>
+        </div>
+      </div>
+      
+      <div class="navigation-buttons">
+        <a href="lesson10.html" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Previous Lesson</a>
+        <a href="#" class="btn" id="next-lesson-btn">Next Lesson <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+    
+    <aside class="lesson-sidebar">
+      <div class="progress-widget">
+        <h3>Your Progress</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-text">0% Complete</p>
+        <div class="completion-badge" id="completion-badge">
+          <i class="fas fa-trophy"></i> Lesson Complete!
+        </div>
+      </div>
+      
+      <h3>Lesson Checkpoints</h3>
+      <div class="checkpoint">
+        <input type="checkbox" id="check1">
+        <label for="check1">Understand Inheritance</label>
+      </div>
+      <div class="checkpoint">
+        <input type="checkbox" id="check2">
+        <label for="check2">Know how Polymorphism works</label>
+      </div>
+      <div class="checkpoint">
+        <input type="checkbox" id="check3">
+        <label for="check3">Understand Encapsulation</label>
+      </div>
+      <div class="checkpoint">
+        <input type="checkbox" id="check4">
+        <label for="check4">Know how Abstraction works</label>
+      </div>
+      <div class="checkpoint">
+        <input type="checkbox" id="check5">
+        <label for="check5">Completed the mini challenge</label>
+      </div>
+      
+      <div style="margin-top: 2rem;">
+        <h3>Lesson Resources</h3>
+        <div class="list">
+          <a class="card" href="#">
+            <i class="fas fa-download"></i> Download Lesson Notes
+          </a>
+          <a class="card" href="#">
+            <i class="fas fa-video"></i> Video Tutorial
+          </a>
+          <a class="card" href="#">
+            <i class="fas fa-code"></i> Source Code
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="container foot">
+      <span>© 2025 Java Journey. All rights reserved.</span>
+      <nav aria-label="Footer">
+        <a class="btn" href="#privacy">Privacy</a>
+        <a class="btn" href="#terms">Terms</a>
+        <a class="btn" href="mailto:tempkoho942@gmail.com">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <a href="#top" class="to-top" id="toTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // Mobile menu toggle
+    const hamb = document.getElementById("hamb");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    if (hamb && mobileMenu) {
+      hamb.addEventListener("click", () => {
+        mobileMenu.classList.toggle("show");
+        hamb.classList.toggle("active");
+      });
+    }
+
+    // Back to top button
+    const toTop = document.getElementById("toTop");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 400) {
+        toTop.style.display = "flex";
+      } else {
+        toTop.style.display = "none";
+      }
+    });
+
+    // Smooth scroll back to top
+    if (toTop) {
+      toTop.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    // Reading progress bar
+    const progress = document.getElementById("progress");
+    window.addEventListener("scroll", () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrolled = (scrollTop / docHeight) * 100;
+      progress.style.width = scrolled + "%";
+    });
+
+    // Lesson progress tracking
+    const checkpoints = document.querySelectorAll('.checkpoint input');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const completionBadge = document.getElementById('completion-badge');
+    const nextLessonBtn = document.getElementById('next-lesson-btn');
+    
+    // Initialize progress from localStorage or set to 0
+    let completedCheckpoints = JSON.parse(localStorage.getItem('lesson11-12Progress')) || Array(checkpoints.length).fill(false);
+    
+    // Update checkboxes based on saved progress
+    completedCheckpoints.forEach((completed, index) => {
+      if (index < checkpoints.length) {
+        checkpoints[index].checked = completed;
+        if (completed) {
+          checkpoints[index].parentElement.classList.add('completed');
+        }
+      }
+    });
+    
+    // Calculate and update progress
+    function updateProgress() {
+      const completed = Array.from(checkpoints).filter(checkbox => checkbox.checked).length;
+      const progressPercent = (completed / checkpoints.length) * 100;
+      
+      progressFill.style.width = `${progressPercent}%`;
+      progressText.textContent = `${Math.round(progressPercent)}% Complete`;
+      
+      // Save progress to localStorage
+      completedCheckpoints = Array.from(checkpoints).map(checkbox => checkbox.checked);
+      localStorage.setItem('lesson11-12Progress', JSON.stringify(completedCheckpoints));
+      
+      // Show completion badge if all checkpoints are completed
+      if (completed === checkpoints.length) {
+        completionBadge.classList.add('show');
+        nextLessonBtn.style.opacity = '1';
+        nextLessonBtn.style.pointerEvents = 'auto';
+      } else {
+        completionBadge.classList.remove('show');
+        nextLessonBtn.style.opacity = '0.5';
+        nextLessonBtn.style.pointerEvents = 'none';
+      }
+    }
+    
+    // Add event listeners to checkboxes
+    checkpoints.forEach((checkbox, index) => {
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          checkbox.parentElement.classList.add('completed');
+        } else {
+          checkbox.parentElement.classList.remove('completed');
+        }
+        updateProgress();
+      });
+    });
+    
+    // Initialize progress on page load
+    window.addEventListener('load', () => {
+      updateProgress();
+      
+      // Animate progress bar
+      setTimeout(() => {
+        const completed = Array.from(checkpoints).filter(checkbox => checkbox.checked).length;
+        const progressPercent = (completed / checkpoints.length) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+      }, 500);
+    });
+    
+    // Next lesson button functionality
+    if (nextLessonBtn) {
+      nextLessonBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('🎉 Congratulations on completing Lessons 11 & 12! Now moving to Lesson 13...');
+        setTimeout(() => {
+          window.location.href = "lesson13.html"; 
+        }, 500); // waits half a second after alert before redirect
+      });
+    }
+  </script>
+</body>
+</html>

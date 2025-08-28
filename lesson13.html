@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Java Journey • Visual Guide: The 4 Superpowers of OOP</title>
+  <meta name="description" content="Visual explanations of the four pillars of OOP: Inheritance, Polymorphism, Encapsulation, and Abstraction." />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Consistent with the main site styling */
+    :root {
+      --java-blue: #5382a1;
+      --java-orange: #f89820;
+      --java-dark: #2c3e50;
+      --java-light: #ecf0f1;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --text: #2c3e50;
+      --muted: #7f8c8d;
+      --bg: #f9fafb;
+      --white: #ffffff;
+      --shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --glow: 0 0 10px rgba(88, 152, 240, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--java-blue);
+      color: var(--white);
+      padding: .5rem 1rem;
+      z-index: 100;
+    }
+    .skip-link:focus { top: 0; }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 50;
+      box-shadow: var(--shadow);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .brand { 
+      display: flex; 
+      align-items: center; 
+      gap: .75rem; 
+    }
+    .brand-title { 
+      font-weight: 700; 
+      font-size: 1.5rem; 
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo { 
+      height: 45px; 
+      width: auto; 
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      padding: .5rem 0;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+    .nav-links a:hover::after,
+    .nav-links a:focus::after,
+    .nav-links a.active::after { 
+      transform: scaleX(1); 
+    }
+    .nav-links a:hover {
+      color: var(--java-blue);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      color: var(--white);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow);
+    }
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: var(--glow);
+    }
+
+    .hamb {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      position: relative;
+    }
+    .hamb span,
+    .hamb span::before,
+    .hamb span::after {
+      display: block;
+      background: var(--text);
+      height: 3px;
+      width: 25px;
+      position: absolute;
+      border-radius: 3px;
+      transition: all 0.3s;
+    }
+    .hamb span {
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .hamb span::before,
+    .hamb span::after {
+      content: "";
+      left: 0;
+    }
+    .hamb span::before { top: -8px; }
+    .hamb span::after { top: 8px; }
+    
+    .hamb.active span {
+      background: transparent;
+    }
+    .hamb.active span::before {
+      transform: rotate(45deg);
+      top: 0;
+    }
+    .hamb.active span::after {
+      transform: rotate(-45deg);
+      top: 0;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      border-top: 1px solid #e5e7eb;
+      padding: 1rem 0;
+    }
+    .mobile-menu.show { display: flex; }
+    .mobile-menu a {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .mobile-menu a:hover {
+      background: var(--java-light);
+      padding-left: 2rem;
+    }
+
+    .lesson-header {
+      padding: 2rem 0;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(83, 130, 161, 0.1), rgba(248, 152, 32, 0.1));
+      border-radius: 0 0 20px 20px;
+      margin-bottom: 2rem;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .lesson-tag {
+      font-size: 0.9rem;
+      color: var(--java-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: rgba(83, 130, 161, 0.1);
+      border-radius: 50px;
+      margin-bottom: 1rem;
+    }
+    .lesson-title {
+      font-size: 2.5rem;
+      margin: 0.5rem 0 1rem;
+      background: linear-gradient(135deg, var(--java-blue), var(--java-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .lesson-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .lesson-body {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 2rem;
+    }
+    
+    .lesson-section {
+      margin-bottom: 3rem;
+    }
+    
+    .lesson-section h2 {
+      color: var(--java-dark);
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .lesson-section h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+    }
+    
+    .info-card {
+      background: rgba(83, 130, 161, 0.05);
+      border-left: 4px solid var(--java-blue);
+      padding: 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+    
+    .visual-guide-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .visual-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    
+    .visual-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .visual-image {
+      width: 100%;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      padding: 1rem;
+    }
+    
+    .visual-image svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    
+    .visual-content {
+      padding: 1.5rem;
+    }
+    
+    .visual-content h3 {
+      color: var(--java-blue);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .visual-content h3 i {
+      color: var(--java-orange);
+    }
+    
+    .analogy {
+      background: rgba(248, 152, 32, 0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+      border-left: 3px solid var(--java-orange);
+    }
+    
+    .analogy h4 {
+      color: var(--java-orange);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    
+    footer { 
+      background: var(--java-dark); 
+      color: #d1d5db; 
+      padding: 2rem 0; 
+      margin-top: 4rem;
+    }
+    .foot { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .foot a.btn { 
+      background: none; 
+      border: 1px solid #d1d5db; 
+      color: #d1d5db; 
+    }
+    .foot a.btn:hover { 
+      background: rgba(255,255,255,0.1); 
+    }
+
+    .to-top {
+      position: fixed;
+      right: 2rem;
+      bottom: 2rem;
+      background: var(--java-blue);
+      color: var(--white);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+      z-index: 99;
+      transition: all 0.3s;
+    }
+    .to-top:hover {
+      background: var(--java-orange);
+      transform: translateY(-5px);
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--java-blue), var(--java-orange));
+      width: 0%;
+      z-index: 100;
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .visual-guide-container { grid-template-columns: 1fr; }
+      .lesson-title { font-size: 2rem; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamb { display: block; }
+      .mobile-menu { display: none; }
+      .lesson-title { font-size: 1.75rem; }
+      .navigation-buttons { flex-direction: column; gap: 1rem; }
+      .foot { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="progress" id="progress"></div>
+
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNTM4MmExIiBkPSJNNDQ4IDQwMGMwIDM1LjMtMTQzLjMgNjQtMzIwIDY0UjAgNDM1LjMgMCA0MDBzMTQzLjMtNjQgMzIwLTY0czMyMCAyOC43IDMyMCA2NHptLTMyMC0yNTZjLTExNC45IDAtMjA4LTQwLjctMjA4LTkwLjZzOTMuMS05MC42IDIwOC05MC42IDIwOCA0MC43IDIwOCA5MC42LTk3LjEgOTAuNi0yMDggOTAuNnoiLz48cGF0aCBmaWxsPSIjZjg5ODIwIiBkPSJNMjI4IDE2OGMtMzMuMSAwLTYwLTEzLjQtNjAtMzBzMjYuOS0zMCA2MC0zMCA2MCAxMy40IDYwIDMwLTI2LjkgMzAtNjAgMzB6bTE1MiA1NmMwIDE2LjYtNDMuOSAzMC05OCAzMHMtOTgtMTMuNC05OC0zMCA0My45LTMwIDk4LTMwIDk4IDEzLjQgOTggMzB6Ii8+PC9zdmc+" alt="Java Journey Logo" />
+        <div class="brand-title">Java Journey</div>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a class="active" href="#lesson">Lessons</a>
+        <a href="#challenges">Challenges</a>
+        <a href="#progress-track">Progress</a>
+        <a href="#community">Community</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn" href="#subscribe">Subscribe</a>
+        <button class="hamb" id="hamb" aria-label="Open menu"><span></span></button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" aria-label="Mobile">
+      <a href="index.html">Home</a>
+      <a href="#lesson">Lessons</a>
+      <a href="#challenges">Challenges</a>
+      <a href="#progress-track">Progress</a>
+      <a href="#community">Community</a>
+      <a href="#subscribe">Subscribe</a>
+    </div>
+  </header>
+
+  <section class="lesson-header container">
+    <span class="lesson-tag">Visual Learning</span>
+    <h1 class="lesson-title">🎨 Visual Guide: The 4 Superpowers of OOP</h1>
+    <p class="meta">See OOP concepts come to life through visual explanations and diagrams</p>
+  </section>
+
+  <div class="container lesson-content" id="main">
+    <article class="lesson-body">
+      <div class="lesson-section">
+        <h2><i class="fas fa-paint-brush"></i> Learning Through Visualization</h2>
+        <p>Sometimes complex programming concepts are easier to understand when you can <strong>see</strong> them. This visual guide will help you grasp the four pillars of Object-Oriented Programming through diagrams and analogies.</p>
+        
+        <div class="info-card">
+          <p><strong>💡 Pro Tip:</strong> Try to connect each diagram to the code examples you've seen in the lessons. This will help bridge the gap between visual concepts and actual implementation.</p>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2><i class="fas fa-family"></i> 🧬 Inheritance — Family Tree</h2>
+        
+        <div class="visual-guide-container">
+          <div class="visual-card">
+            <div class="visual-image">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 900 520">
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                <style>
+                  .title { font: bold 28px sans-serif; fill: #222; }
+                  .label { font: 16px sans-serif; fill: #222; }
+                  .node { fill: #f2f7ff; stroke: #3b82f6; stroke-width: 2; rx: 12; }
+                  .child { fill: #fef6f2; stroke: #f97316; stroke-width: 2; rx: 12; }
+                  .method { font: 14px monospace; fill: #444; }
+                  .arrow { stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+                </style>
+
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                  </marker>
+                </defs>
+
+                <text x="30" y="40" class="title">Inheritance — Parent ➜ Children</text>
+                <text x="30" y="75" class="label">Parent class shares common traits. Children extend and add their own.</text>
+
+                <!-- Parent node -->
+                <rect x="360" y="110" width="180" height="90" class="node"/>
+                <text x="370" y="140" class="label">class Animal</text>
+                <text x="370" y="165" class="method">+ eat()</text>
+                <text x="470" y="165" class="method">+ sleep()</text>
+
+                <!-- Lines to children -->
+                <line x1="450" y1="200" x2="250" y2="300" class="arrow"/>
+                <line x1="450" y1="200" x2="650" y2="300" class="arrow"/>
+
+                <!-- Child 1 -->
+                <rect x="170" y="300" width="180" height="100" class="child"/>
+                <text x="180" y="330" class="label">class Dog extends Animal</text>
+                <text x="180" y="355" class="method">+ bark()</text>
+
+                <!-- Child 2 -->
+                <rect x="610" y="300" width="180" height="100" class="child"/>
+                <text x="620" y="330" class="label">class Cat extends Animal</text>
+                <text x="620" y="355" class="method">+ meow()</text>
+
+                <!-- Legend -->
+                <rect x="30" y="420" width="22" height="16" class="node"/>
+                <text x="60" y="433" class="label">Parent class</text>
+                <rect x="240" y="420" width="22" height="16" class="child"/>
+                <text x="270" y="433" class="label">Child class</text>
+              </svg>
+            </div>
+            <div class="visual-content">
+              <h3><i class="fas fa-sitemap"></i> Tree Structure</h3>
+              <p>Inheritance creates a parent-child relationship between classes, forming a hierarchy where children inherit properties and behaviors from their parents.</p>
+            </div>
+          </div>
+          
+          <div class="visual-card">
+            <div class="visual-content">
+              <h3><i class="fas fa-lightbulb"></i> Key Concept</h3>
+              <p>Inheritance allows a class (child) to inherit fields and methods from another class (parent). This promotes code reuse and establishes relationships between classes.</p>
+              
+              <div class="analogy">
+                <h4><i class="fas fa-users"></i> Analogy: Family Tree 👨‍👩‍👧‍👦</h4>
+                <p>Just like children inherit traits from their parents, child classes inherit methods and properties from parent classes. A Dog and Cat both inherit basic animal behaviors like eating and sleeping from the Animal class, but they also have their own unique behaviors.</p>
+              </div>
+              
+              <h3><i class="fas fa-code"></i> Code Connection</h3>
+              <p>In code, this translates to:</p>
+              <ul>
+                <li><code>class Dog extends Animal</code> - Dog inherits from Animal</li>
+                <li>Dog automatically gets <code>eat()</code> and <code>sleep()</code> methods</li>
+                <li>Dog can add its own methods like <code>bark()</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2><i class="fas fa-theater-masks"></i> 🎭 Polymorphism — Many Forms</h2>
+        
+        <div class="visual-guide-container">
+          <div class="visual-card">
+            <div class="visual-image">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 900 520">
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                <style>
+                  .title { font: bold 28px sans-serif; fill: #222; }
+                  .label { font: 16px sans-serif; fill: #222; }
+                  .stage { fill: #f1f5f9; stroke: #64748b; stroke-width: 2; rx: 16; }
+                  .actor { fill: #eefcf3; stroke: #10b981; stroke-width: 2; rx: 12; }
+                  .method { font: 14px monospace; fill: #111827; }
+                  .arrow { stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+                </style>
+
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                  </marker>
+                </defs>
+
+                <text x="30" y="40" class="title">Polymorphism — One name, many behaviors</text>
+                <text x="30" y="75" class="label">Same method sound() behaves differently based on the object type.</text>
+
+                <!-- Base class -->
+                <rect x="360" y="100" width="180" height="80" class="stage"/>
+                <text x="370" y="130" class="label">class Animal</text>
+                <text x="370" y="155" class="method">+ sound()</text>
+
+                <!-- Arrows -->
+                <line x1="450" y1="180" x2="260" y2="260" class="arrow"/>
+                <line x1="450" y1="180" x2="640" y2="260" class="arrow"/>
+
+                <!-- Actors/children -->
+                <rect x="170" y="260" width="220" height="100" class="actor"/>
+                <text x="180" y="290" class="label">class Dog extends Animal</text>
+                <text x="180" y="315" class="method">sound() ➜ "Woof!"</text>
+
+                <rect x="590" y="260" width="220" height="100" class="actor"/>
+                <text x="600" y="290" class="label">class Cat extends Animal</text>
+                <text x="600" y="315" class="method">sound() ➜ "Meow!"</text>
+
+                <!-- Bottom caption -->
+                <text x="30" y="470" class="label">Call through Animal reference: Animal a = new Dog(); a.sound(); // Woof!</text>
+              </svg>
+            </div>
+            <div class="visual-content">
+              <h3><i class="fas fa-magic"></i> Many Forms</h3>
+              <p>Polymorphism allows objects of different classes to be treated as objects of a common superclass, with each object behaving appropriately based on its actual class.</p>
+            </div>
+          </div>
+          
+          <div class="visual-card">
+            <div class="visual-content">
+              <h3><i class="fas fa-lightbulb"></i> Key Concept</h3>
+              <p>Polymorphism means "many forms." It allows the same method name to behave differently depending on which object is calling it.</p>
+              
+              <div class="analogy">
+                <h4><i class="fas fa-theater-masks"></i> Analogy: Actors on Stage 🎭</h4>
+                <p>Think of the word "play" — a child plays with toys, a musician plays an instrument, and an athlete plays a sport. The same word has different meanings depending on who is using it. Similarly, the same method name can have different implementations in different classes.</p>
+              </div>
+              
+              <h3><i class="fas fa-code"></i> Code Connection</h3>
+              <p>In code, this translates to:</p>
+              <ul>
+                <li>Multiple classes can have a method with the same name</li>
+                <li><code>animal.sound()</code> produces different results based on the actual object type</li>
+                <li>A Dog says "Woof!" while a Cat says "Meow!"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2><i class="fas fa-lock"></i> 🔒 Encapsulation — Data Protection</h2>
+        
+        <div class="visual-guide-container">
+          <div class="visual-card">
+            <div class="visual-image">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 900 520">
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                <style>
+                  .title { font: bold 28px sans-serif; fill: #222; }
+                  .label { font: 16px sans-serif; fill: #222; }
+                  .capsule { fill: #eef2ff; stroke: #6366f1; stroke-width: 3; }
+                  .inner { font: 14px monospace; fill: #111827; }
+                  .btn { fill: #ecfeff; stroke: #06b6d4; stroke-width: 2; rx: 10; }
+                  .arrow { stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+                </style>
+
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                  </marker>
+                  <clipPath id="pill">
+                    <rect x="220" y="160" width="460" height="180" rx="90" ry="90"/>
+                  </clipPath>
+                </defs>
+
+                <text x="30" y="40" class="title">Encapsulation — Hide data, control access</text>
+                <text x="30" y="75" class="label">Use private fields + public getters/setters.</text>
+
+                <!-- Capsule -->
+                <rect x="220" y="160" width="460" height="180" rx="90" ry="90" class="capsule"/>
+                <g clip-path="url(#pill)">
+                  <rect x="220" y="160" width="230" height="180" fill="#e0e7ff"/>
+                  <rect x="450" y="160" width="230" height="180" fill="#c7d2fe"/>
+                </g>
+
+                <!-- Inner data -->
+                <text x="260" y="230" class="inner">private int balance = 1000;</text>
+                <text x="260" y="260" class="inner">/* hidden inside the class */</text>
+
+                <!-- Buttons / methods -->
+                <rect x="710" y="210" width="150" height="40" class="btn"/>
+                <text x="720" y="235" class="inner">getBalance()</text>
+                <line x1="710" y1="230" x2="680" y2="230" class="arrow"/>
+
+                <rect x="710" y="270" width="150" height="40" class="btn"/>
+                <text x="720" y="295" class="inner">deposit()</text>
+                <line x1="710" y1="290" x2="680" y2="290" class="arrow"/>
+
+                <!-- Code caption -->
+                <text x="30" y="470" class="label">Only methods can touch the private data. Outside code uses get/set.</text>
+              </svg>
+            </div>
+            <div class="visual-content">
+              <h3><i class="fas fa-shield-alt"></i> Data Protection</h3>
+              <p>Encapsulation bundles data (variables) and methods (functions) that operate on the data into a single unit (class) and restricts direct access to some of the object's components.</p>
+            </div>
+          </div>
+          
+          <div class="visual-card">
+            <div class="visual-content">
+              <h3><i class="fas fa-lightbulb"></i> Key Concept</h3>
+              <p>Encapsulation is about keeping data safe by making fields private and providing public methods to access and modify them. This allows for control over how data is accessed and modified.</p>
+              
+              <div class="analogy">
+                <h4><i class="fas fa-capsules"></i> Analogy: Medicine Capsule 💊</h4>
+                <p>Medicine is safely contained inside a capsule. You don't see or touch the medicine directly—you just take the capsule. Similarly, data is hidden inside a class, and you can only interact with it through controlled methods (getters and setters).</p>
+              </div>
+              
+              <h3><i class="fas fa-code"></i> Code Connection</h3>
+              <p>In code, this translates to:</p>
+              <ul>
+                <li>Using <code>private</code> keyword for sensitive data</li>
+                <li>Providing <code>public getX()</code> and <code>setX()</code> methods</li>
+                <li>Controlling how data is accessed and modified</li>
+                <li>Example: <code>account.getBalance()</code> instead of directly accessing <code>account.balance</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lesson-section">
+        <h2><i class="fas fa-paint-brush"></i> 🎨 Abstraction — Simplifying Complexity</h2>
+        
+        <div class="visual-guide-container">
+          <div class="visual-card">
+            <div class="visual-image">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 900 520">
+                <rect width="100%" height="100%" fill="#ffffff"/>
+                <style>
+                  .title { font: bold 28px sans-serif; fill: #222; }
+                  .label { font: 16px sans-serif; fill: #222; }
+                  .dash { fill: #f0fdf4; stroke: #22c55e; stroke-width: 2; rx: 16; }
+                  .ctrl { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; rx: 10; }
+                  .engine { fill: #fee2e2; stroke: #ef4444; stroke-width: 2; rx: 12; }
+                  .note { font: 14px monospace; fill: #374151; }
+                  .arrow { stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+                </style>
+
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+                  </marker>
+                </defs>
+
+                <text x="30" y="40" class="title">Abstraction — Use the dashboard, hide the engine</text>
+                <text x="30" y="75" class="label">Interface shows controls; implementation stays hidden.</text>
+
+                <!-- Dashboard -->
+                <rect x="80" y="120" width="340" height="240" class="dash"/>
+                <text x="100" y="150" class="label">Interface: Drivable</text>
+                <rect x="110" y="180" width="130" height="40" class="ctrl"/>
+                <text x="120" y="205" class="note">start()</text>
+                <rect x="110" y="230" width="130" height="40" class="ctrl"/>
+                <text x="120" y="255" class="note">accelerate()</text>
+                <rect x="110" y="280" width="130" height="40" class="ctrl"/>
+                <text x="120" y="305" class="note">brake()</text>
+
+                <!-- Arrow to engine -->
+                <line x1="420" y1="240" x2="520" y2="240" class="arrow"/>
+
+                <!-- Engine / implementation -->
+                <rect x="520" y="170" width="300" height="140" class="engine"/>
+                <text x="530" y="200" class="label">Implementation: CarEngine</text>
+                <text x="530" y="230" class="note">private void injectFuel() { ... }</text>
+                <text x="530" y="260" class="note">private void igniteSpark() { ... }</text>
+                <text x="530" y="290" class="note">private void rotateCrankshaft() { ... }</text>
+
+                <!-- Bottom caption -->
+                <text x="30" y="470" class="label">Driver only needs to know the interface, not the complex implementation.</text>
+              </svg>
+            </div>
+            <div class="visual-content">
+              <h3><i class="fas fa-eye-slash"></i> Hiding Complexity</h3>
+              <p>Abstraction focuses on hiding the internal implementation details and showing only the essential features of an object. It reduces complexity by allowing you to work with high-level concepts.</p>
+            </div>
+          </div>
+          
+          <div class="visual-card">
+            <div class="visual-content">
+              <h3><i class="fas fa-lightbulb"></i> Key Concept</h3>
+              <p>Abstraction means hiding the complex implementation details and showing only the necessary features of an object. It helps reduce programming complexity and effort.</p>
+              
+              <div class="analogy">
+                <h4><i class="fas fa-car"></i> Analogy: Driving a Car 🚗</h4>
+                <p>When you drive a car, you don't need to know how the engine works internally. You just need to know how to use the steering wheel, pedals, and gear shift. The complex details are abstracted away, allowing you to focus on driving.</p>
+              </div>
+              
+              <h3><i class="fas fa-code"></i> Code Connection</h3>
+              <p>In code, this translates to:</p>
+              <ul>
+                <li>Using abstract classes and interfaces to define what an object does</li>
+                <li>Hiding the complex implementation details</li>
+                <li>Example: A <code>List</code> interface defines what a list does, but you don't need to know how <code>ArrayList</code> or <code>LinkedList</code> implement it internally</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="navigation-buttons">
+        <a href="lesson11and12.html" class="btn"><i class="fas fa-arrow-left"></i> Previous Lesson</a>
+        <a href="lesson14.html" class="btn">Next Lesson <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <div class="container foot">
+      <p>&copy; 2023 Java Journey. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#" class="btn">Terms</a>
+        <a href="#" class="btn">Privacy</a>
+        <a href="#" class="btn">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" class="to-top" id="toTop" aria-label="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // Mobile menu toggle
+    const hamb = document.getElementById('hamb');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    hamb.addEventListener('click', () => {
+      hamb.classList.toggle('active');
+      mobileMenu.classList.toggle('show');
+    });
+    
+    // Back to top button
+    const toTop = document.getElementById('toTop');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        toTop.style.display = 'flex';
+      } else {
+        toTop.style.display = 'none';
+      }
+    });
+    
+    // Progress bar
+    const progress = document.getElementById('progress');
+    window.addEventListener('scroll', () => {
+      const totalHeight = document.body.scrollHeight - window.innerHeight;
+      const progressHeight = (window.pageYOffset / totalHeight) * 100;
+      progress.style.width = progressHeight + '%';
+    });
+  </script>
+</body>
+</html>
